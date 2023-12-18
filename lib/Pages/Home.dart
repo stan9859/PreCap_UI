@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
 
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFDFFCA1A).withOpacity(0.77),
+                    backgroundColor: Color(0xFFFFB636).withOpacity(0.85),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
                   ),
 
@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                         );
                           },
                           style: ElevatedButton.styleFrom(
-                              primary: Color(0xFDFFCA1A).withOpacity(0.77),
+                              primary: Color(0xFFFFB636).withOpacity(0.85),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(50))),
                           ),
                           child: Center(
@@ -437,8 +437,7 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xFDFFCA1A)
-                                , // Choose your desired background color
+                            color: Color(0xFFFFB636).withOpacity(0.85), 
                           ),
                           child: Text(
                             '${value.cartItems.length}',
@@ -544,7 +543,7 @@ class _HomePageState extends State<HomePage> {
                                     );
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    primary: Color(0xff11b039).withOpacity(0.8), // Set the button color
+                                    primary: Color(0xFFFFB636).withOpacity(0.85), // Set the button color
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),

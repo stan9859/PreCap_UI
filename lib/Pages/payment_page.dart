@@ -74,6 +74,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 borderRadius: 16,
                 elevation: 1,
                 outerColor: Color(0xff11b039).withOpacity(0.8),
+
                 text: 'Slide to Pay',
                 onSubmit: () {
                   // Handle the payment logic here
