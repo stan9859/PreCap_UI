@@ -1,17 +1,18 @@
-import 'package:demo3/Pages/login_page.dart';
 import 'package:demo3/Pages/payment_page.dart';
 import 'package:demo3/models/category_model.dart';
 import 'package:demo3/models/diet_model.dart';
 import 'package:demo3/models/popular_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:demo3/Pages/CategoriesMenuPage.dart';
 import 'package:demo3/models/menu_list.dart';
 import 'package:demo3/models/cart_model.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
+
 
 /*
 Things needed:
-sign in
 payment
 menu description
  */
@@ -22,29 +23,35 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 
 }
-
 class _HomePageState extends State<HomePage> {
   List<CategoryModel> categories = [];
   List<DietModel> diets = [];
   List<PopularDietsModel> popularDiets =[];
   List<MenuList> Menu = [];
-  // CartListModel cartList = CartListModel();
-
-
+  @override
+  void initState() {
+    super.initState();
+    _getInitialInfo();
+  }
   void _getInitialInfo(){
     categories=CategoryModel.getCategories();
     diets=DietModel.getDiets();
     popularDiets = PopularDietsModel.getPopularDiets();
     Menu = MenuList.getMenu();
 }
+void signUserOut() {
+    FirebaseAuth.instance.signOut();
+}
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser!;
     _getInitialInfo();
     return Scaffold(
       appBar: menu(),
       backgroundColor: Color(0xFF86D19B),
       body: ListView(
         children: [
+           login_info(user),
           searchfield(),
           const SizedBox(height: 40,),
           categoriesSection(),
@@ -56,6 +63,16 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     ) ;
+  }
+  SizedBox login_info(User user) {
+    return SizedBox(child: Padding(
+          padding: EdgeInsets.only(left: 20.0),
+          child: Text("Logged in as: " + user.email!,
+          style: TextStyle(
+              color: Color(0xff043611),
+              fontSize: 18,
+              fontWeight: FontWeight.w600),),
+        ),);
   }
   Column popularSection() {
     return Column(
@@ -87,7 +104,8 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CategoriesMenuPage(category : categories[0],
+                        builder: (context) => CategoriesMenuPage(
+                          category : categories[0],
                           menu: MenuList.getMenu(),),
                       ),
                     );
@@ -380,25 +398,15 @@ class _HomePageState extends State<HomePage> {
       elevation: 0.0,
       centerTitle: true,
       leading: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-          // Handle leading tap
-        },
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          alignment: Alignment.center,
-          child: Image.asset(
-            'assets/icons/left-arrow-5.png',
-            height: 30,
-            width: 30,
+        child: IconButton(
+          onPressed: signUserOut,
+          icon: Transform(
+            alignment: Alignment.center,
+              transform: Matrix4.rotationY(math.pi),
+              child: Icon(Icons.logout,
+              color: Colors.black,
+              size: 25,)),
           ),
-          decoration: BoxDecoration(
-              color: const Color(0xFF86D19B),
-              borderRadius: BorderRadius.circular(10)),
-        ),
       ),
       actions: [
         GestureDetector(
@@ -425,14 +433,13 @@ class _HomePageState extends State<HomePage> {
                   width: 30,
                   child: Stack(
                     children: [
-                      Image.asset(
-                        'assets/icons/cart4.png',
-                        height: 50,
-                        width: 40,
+                      Icon(Icons.shopping_bag_outlined,
+                        color: Colors.black,
+                        size: 25,
                       ),
                       Positioned(
-                        top: 0,
-                        right: 0,
+                        top: -3,
+                        right: -2,
                         child: Container(
                           padding: EdgeInsets.all(4),
                           decoration: BoxDecoration(
@@ -455,7 +462,6 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
   Future _displayCartSheet(BuildContext context) {
     return showModalBottomSheet(
       context: context,

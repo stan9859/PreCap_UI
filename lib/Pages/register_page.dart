@@ -2,56 +2,66 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/login_textfield.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   final Function()? onTap;
-  const LoginPage({super.key, required this.onTap});
+  const RegisterPage({super.key, required this.onTap});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class RegisterPageState extends State<RegisterPage> {
   // text editing controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
 
   // sign user in method
-  void signUserIn(BuildContext context) async {
+  void signUserup(BuildContext context) async {
     // Show loading circle
     showDialog(context: context, builder: (context) {
       print('circle shown');
       return  const Center(
-      child: CircularProgressIndicator(color:Color(0xff043611),),
-    );
-      },
+        child: CircularProgressIndicator(color:Color(0xff043611),),
+      );
+    },
     );
 
-    // try sign in
-      try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+    if( passwordController.text != confirmPasswordController.text){
+      Navigator.pop(context);
+      showErrorMessage("Passwords do not match!");
+      return;
+    }
+
+    // try sign up
+    try {
+     // make sure password and confirm password is same!
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
-        // pop the loading circle if login is successful
-        Navigator.pop(context);
-      } on FirebaseAuthException catch (e) {
-        print('ERROR HAS OCCURRED: $e');
-        Navigator.pop(context);
-        // wrong email
-        // if (e.code == 'user-not-found') {
-        //   //show error to user
-        //   wrongEmailMessage(context);
-        //   print("wrong email!");
-        // }
-        // // wrong password
-        // else if (e.code == 'wrong-password') {
-        //  // show error to user
-        //   wrongPasswordMessage(context);
-        //   print("wrong password!");
-        // }
-        // handle invalid credential
-         showErrorMessage(e.code);
-      }
+
+      // pop the loading circle if login is successful
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      print('ERROR HAS OCCURRED: $e');
+      Navigator.pop(context);
+      // wrong email
+      // if (e.code == 'user-not-found') {
+      //   //show error to user
+      //   wrongEmailMessage(context);
+      //   print("wrong email!");
+      // }
+      // // wrong password
+      // else if (e.code == 'wrong-password') {
+      //  // show error to user
+      //   wrongPasswordMessage(context);
+      //   print("wrong password!");
+      // }
+      // handle invalid credential
+      showErrorMessage(e.code);
+    }
 
   }
   // void wrongEmailMessage(BuildContext context){
@@ -70,36 +80,17 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder:(context) {
         return  AlertDialog(
-        backgroundColor: Color(0xFF86D19B),
+          backgroundColor: Color(0xFF86D19B),
           title: Center(
-        child: Text( message,
-        style: const TextStyle(color: Color(0xff043611),),
-  ),
-        ),
+            child: Text( message,
+              style: const TextStyle(color: Color(0xff043611),),
+            ),
+          ),
         );
       },
     );
   }
-  void wrongEmailFormat(BuildContext context){
-    showDialog(
-      context: context,
-      builder:(context) {
-        return const AlertDialog(
-          title: Text('Wrong e-mail or password!'),
-        );
-      },
-    );
-  }
-  void emailNotRegistered(BuildContext context){
-    showDialog(
-      context: context,
-      builder:(context) {
-        return const AlertDialog(
-          title: Text('Wrong E-mail format!'),
-        );
-      },
-    );
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,11 +105,11 @@ class _LoginPageState extends State<LoginPage> {
                 // logo
                 const Icon(
                   Icons.lock,
-                  size: 100,
+                  size: 50,
                 ),
                 const SizedBox(height: 50),
                 Text(
-                  'Welcome back you\'ve been missed!',
+                  'Let\'s create an account for you!',
                   style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 16,
@@ -139,22 +130,24 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
+                MyTextField(
+                  controller: confirmPasswordController,
+                  hintText: 'Confirm password',
+                  obscureText: true,
+                ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 25),
                 // sign in button
-                sign_in_button(context),
+                sign_up_button(context),
 
                 const SizedBox(height: 50),
 
@@ -202,14 +195,14 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not a member?',
+                      'Already have an account?',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
                       child: const Text(
-                        'Register now',
+                        'Login now',
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
@@ -256,14 +249,14 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Container sign_in_button(BuildContext context) {
+  Container sign_up_button(BuildContext context) {
     return Container(
       height: 60,
       width: 370,
       child: ElevatedButton(
         onPressed: () {
           // Add your sign-in logic here
-          signUserIn(context);
+          signUserup(context);
           print('sign in button pressed!');
         },
         style: ElevatedButton.styleFrom(
@@ -275,7 +268,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: Center(
           child: Text(
-            "Sign In",
+            "Sign Up",
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
